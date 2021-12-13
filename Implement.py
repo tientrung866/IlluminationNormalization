@@ -4,8 +4,15 @@ import numpy as np
 import cv2 as cv
 import glob
 
-ipath = "/Users/admin/Documents/GitHub/IlluminationNormalization/Input A"
-opath = "/Users/admin/Documents/GitHub/IlluminationNormalization/HE1"
+ipathA = "/Users/admin/Documents/GitHub/IlluminationNormalization/Input A"
+opathA_HE1 = "/Users/admin/Documents/GitHub/IlluminationNormalization/HE1"
+opathA_HE2 = "/Users/admin/Documents/GitHub/IlluminationNormalization/HE2"
+opathA_ADC = "/Users/admin/Documents/GitHub/IlluminationNormalization/ADC"
+opathA_PLCE = "/Users/admin/Documents/GitHub/IlluminationNormalization/PLCE"
+
+innitgamma = 0.5
+anchorbeta = 2.75
+tracking_list_beta = list(np.arange(1, anchorbeta + 0.5, 0.01))
 
 # region FUNCTION
 def rescale(matrix):
@@ -59,8 +66,8 @@ def gammaCorrection(img_original, gamma):
     return res
 
 
-def adaptiveGammaCorrection(image, gamma):
-    pre = gammaCorrection(image, gamma)
+def adaptiveGammaCorrection(image):
+    pre = image
     PDF = histogram(pre)
 
     lookUpTable = np.empty((1, 256), np.uint8)
@@ -92,7 +99,7 @@ def sumofCrossCorellation(image0):
 
     # powlog:
     Alpha = 1.1
-    list_beta = list(np.arange(1, 50, 0.1))
+    list_beta = tracking_list_beta
 
     Corr_values = []
     for beta in list_beta:
@@ -119,20 +126,70 @@ def powTheLogContrastEnhancement(image, alpha, beta):
 
 
 # endregion
-chars = '/'
+charsA = 'A/'
 chare = '_'
 
-# myipath = os.path.join(ipath, '/*.png')
-for each in glob.iglob(ipath + '/*.png'):
+# # myipathA = os.path.join(ipathA, '/*.png')
+# for each in glob.iglob(ipathA + '/*.png'):
+#     imstring = each
+#     imname = imstring[imstring.find(charsA) + 2: imstring.find(chare)]
+#     print(imname)
+#
+#     image = cv.imread(each)
+#     image0 = cv.cvtColor(image, cv.COLOR_RGB2YCrCb)
+#     y_channel, cr_channel, cb_channel = cv.split(image0)
+#     y_channel = histogram_equalize(y_channel)
+#
+#     image1 = cv.merge([y_channel, cr_channel, cb_channel])
+#     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
+#     cv.imwrite(os.path.join(opathA_HE1, imname + '_HE1.png'), image1)
+
+
+# for each in glob.iglob(ipathA + '/*.png'):
+#     imstring = each
+#     imname = imstring[imstring.find(charsA) + 2: imstring.find(chare)]
+#     print(imname)
+#
+#     image = cv.imread(each)
+#     image0 = cv.cvtColor(image, cv.COLOR_RGB2YCrCb)
+#     y_channel, cr_channel, cb_channel = cv.split(image0)
+#     y_channel = contrastLimitedAdaptiveHistogramEqualization(y_channel)
+#
+#     image1 = cv.merge([y_channel, cr_channel, cb_channel])
+#     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
+#     cv.imwrite(os.path.join(opathA_HE2, imname + '_HE2.png'), image1)
+
+# for each in glob.iglob(ipathA + '/*.png'):
+#     imstring = each
+#     imname = imstring[imstring.find(charsA) + 2: imstring.find(chare)]
+#     print(imname)
+#
+#     image = cv.imread(each)
+#     image0 = cv.cvtColor(image, cv.COLOR_RGB2YCrCb)
+#     y_channel, cr_channel, cb_channel = cv.split(image0)
+#     y_channel = adaptiveGammaCorrection(y_channel)
+#
+#     image1 = cv.merge([y_channel, cr_channel, cb_channel])
+#     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
+#     cv.imwrite(os.path.join(opathA_ADC, imname + '_ADC.png'), image1)
+
+
+
+for each in glob.iglob(ipathA + '/*.png'):
     imstring = each
-    imname = imstring[imstring.find(chars)+1 : imstring.find(chare)]
+    imname = imstring[imstring.find(charsA) + 2: imstring.find(chare)]
+    print(imname)
 
     image = cv.imread(each)
     image0 = cv.cvtColor(image, cv.COLOR_RGB2YCrCb)
     y_channel, cr_channel, cb_channel = cv.split(image0)
-    y_channel = histogram_equalize(y_channel)
+
+    dy = sumofCrossCorellation(y_channel)
+    index_y = np.argmax(dy)
+    last_beta = tracking_list_beta[index_y]
+    y_channel = powTheLogContrastEnhancement(y_channel, 3.75, last_beta)
+    print(last_beta)
 
     image1 = cv.merge([y_channel, cr_channel, cb_channel])
     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
-    cv.imwrite(os.path.join(opath, '/', imname, '_HE1.png'), image1)
-
+    cv.imwrite(os.path.join(opathA_PLCE, imname + '_PLCE.png'), image1)
