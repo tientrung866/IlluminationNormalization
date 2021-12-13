@@ -1,18 +1,23 @@
-import os
-import time
-import numpy as np
-import cv2 as cv
 import glob
+import os
+
+import cv2 as cv
+import numpy as np
+from numpy import diff
 
 ipathA = "/Users/admin/Documents/GitHub/IlluminationNormalization/Input A"
-opathA_HE1 = "/Users/admin/Documents/GitHub/IlluminationNormalization/HE1"
-opathA_HE2 = "/Users/admin/Documents/GitHub/IlluminationNormalization/HE2"
-opathA_ADC = "/Users/admin/Documents/GitHub/IlluminationNormalization/ADC"
-opathA_PLCE = "/Users/admin/Documents/GitHub/IlluminationNormalization/PLCE"
+ipathB = "/Users/admin/Documents/GitHub/IlluminationNormalization/Input B"
 
+opath_HE1 = "/Users/admin/Documents/GitHub/IlluminationNormalization/HE1"
+opath_HE2 = "/Users/admin/Documents/GitHub/IlluminationNormalization/HE2"
+opath_ADC = "/Users/admin/Documents/GitHub/IlluminationNormalization/ADC"
+opath_PLCE = "/Users/admin/Documents/GitHub/IlluminationNormalization/PLCE"
+
+dx = 0.01
 innitgamma = 0.5
-anchorbeta = 2.75
-tracking_list_beta = list(np.arange(1, anchorbeta + 0.5, 0.01))
+anchorbeta = 3.75
+tracking_list_beta = list(np.arange(1, anchorbeta + 0.1, dx))
+
 
 # region FUNCTION
 def rescale(matrix):
@@ -127,12 +132,19 @@ def powTheLogContrastEnhancement(image, alpha, beta):
 
 # endregion
 charsA = 'A/'
-chare = '_'
+charsB = 'B/'
 
-# # myipathA = os.path.join(ipathA, '/*.png')
-# for each in glob.iglob(ipathA + '/*.png'):
+chareA = '_'
+chareB = '.jpeg'
+
+path = ipathB
+chars = charsB
+chare = chareB
+
+# myipathA = os.path.join(ipathA, '/*.png')
+# for each in glob.iglob(path + '/*.jpeg'):
 #     imstring = each
-#     imname = imstring[imstring.find(charsA) + 2: imstring.find(chare)]
+#     imname = imstring[imstring.find(chars) + 2: imstring.find(chare)]
 #     print(imname)
 #
 #     image = cv.imread(each)
@@ -142,12 +154,12 @@ chare = '_'
 #
 #     image1 = cv.merge([y_channel, cr_channel, cb_channel])
 #     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
-#     cv.imwrite(os.path.join(opathA_HE1, imname + '_HE1.png'), image1)
+#     cv.imwrite(os.path.join(opath_HE1, imname + '_HE1.png'), image1)
 
 
-# for each in glob.iglob(ipathA + '/*.png'):
+# for each in glob.iglob(path + '/*.jpeg'):
 #     imstring = each
-#     imname = imstring[imstring.find(charsA) + 2: imstring.find(chare)]
+#     imname = imstring[imstring.find(chars) + 2: imstring.find(chare)]
 #     print(imname)
 #
 #     image = cv.imread(each)
@@ -157,11 +169,11 @@ chare = '_'
 #
 #     image1 = cv.merge([y_channel, cr_channel, cb_channel])
 #     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
-#     cv.imwrite(os.path.join(opathA_HE2, imname + '_HE2.png'), image1)
+#     cv.imwrite(os.path.join(opath_HE2, imname + '_HE2.png'), image1)
 
-# for each in glob.iglob(ipathA + '/*.png'):
+# for each in glob.iglob(path + '/*.jpeg'):
 #     imstring = each
-#     imname = imstring[imstring.find(charsA) + 2: imstring.find(chare)]
+#     imname = imstring[imstring.find(chars) + 2: imstring.find(chare)]
 #     print(imname)
 #
 #     image = cv.imread(each)
@@ -171,13 +183,32 @@ chare = '_'
 #
 #     image1 = cv.merge([y_channel, cr_channel, cb_channel])
 #     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
-#     cv.imwrite(os.path.join(opathA_ADC, imname + '_ADC.png'), image1)
+#     cv.imwrite(os.path.join(opath_ADC, imname + '_ADC.png'), image1)
 
+# for each in glob.iglob(path + '/*.jpeg'):
+#     imstring = each
+#     imname = imstring[imstring.find(chars) + 2: imstring.find(chare)]
+#     print(imname)
+#
+#     image = cv.imread(each)
+#     image0 = cv.cvtColor(image, cv.COLOR_RGB2YCrCb)
+#     y_channel, cr_channel, cb_channel = cv.split(image0)
+#
+#     dy = sumofCrossCorellation(y_channel)
+#
+#     index_y = np.argmax(dy)
+#     last_beta = tracking_list_beta[index_y]
+#
+#     y_channel = powTheLogContrastEnhancement(y_channel, 3.75, last_beta)
+#     print(last_beta)
+#
+#     image1 = cv.merge([y_channel, cr_channel, cb_channel])
+#     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
+#     cv.imwrite(os.path.join(opath_PLCE, imname + '_PLCE.png'), image1)
 
-
-for each in glob.iglob(ipathA + '/*.png'):
+for each in glob.iglob(path + '/*.jpeg'):
     imstring = each
-    imname = imstring[imstring.find(charsA) + 2: imstring.find(chare)]
+    imname = imstring[imstring.find(chars) + 2: imstring.find(chare)]
     print(imname)
 
     image = cv.imread(each)
@@ -185,11 +216,19 @@ for each in glob.iglob(ipathA + '/*.png'):
     y_channel, cr_channel, cb_channel = cv.split(image0)
 
     dy = sumofCrossCorellation(y_channel)
+    ddy = diff(dy) / dx
+    dddy = diff(ddy) / dx
+    ddddy = diff(dddy) / dx
+    dddddy = diff(ddddy) / dx
+    ddddddy = diff(dddddy) / dx
+    dddddddy = diff(ddddddy) / dx
+
     index_y = np.argmax(dy)
     last_beta = tracking_list_beta[index_y]
+
     y_channel = powTheLogContrastEnhancement(y_channel, 3.75, last_beta)
     print(last_beta)
 
     image1 = cv.merge([y_channel, cr_channel, cb_channel])
     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
-    cv.imwrite(os.path.join(opathA_PLCE, imname + '_PLCE.png'), image1)
+    cv.imwrite(os.path.join(opath_PLCE, imname + '_PLCE.png'), image1)
