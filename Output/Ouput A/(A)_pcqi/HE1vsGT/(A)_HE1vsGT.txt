@@ -1,0 +1,17 @@
+Cave: 2620
+Cadik: 1371
+LightHouse: 128
+BelgiumHouse: 466
+Tower: 961
+Kluki: 1170
+Memorial: 299
+Office: 148
+Madison: 684
+Balloons: 114
+Farmhouse: 25265529
+ChineseGarden: 303
+Landscape: 187
+Candle: 373
+Lamp: 787
+House: 532
+Venice: 1182

@@ -5,9 +5,10 @@ import numpy as np
 import cv2 as cv
 import glob
 from matplotlib import pyplot as plt
+from matplotlib.cm import ScalarMappable as cm
 
-a = cv.imread('Ouput B/HE2/iPhone11Pro_IMG_0326_575px_HE2.png', 0)
-b = cv.imread('Ouput B/PLCE/iPhone11Pro_IMG_0326_575px_PLCE.png', 0)
+# img = cv.imread('/Users/admin/Documents/GitHub/IlluminationNormalization/Ouput B/ADC/iPhone11Pro_IMG_0316_575px_ADC.png', 0)
+# ref = cv.imread('/Users/admin/Documents/GitHub/IlluminationNormalization/Groundtruth B/iPhone11Pro_IMG_0316_575px_GT.jpeg', 0)
 
 gaussiankernel = np.array([[1.0278445, 4.10018648, 6.49510362, 4.10018648, 1.0278445],
                            [4.10018648, 16.35610171, 25.90969361, 16.35610171, 4.10018648],
@@ -55,11 +56,88 @@ def pcqi(image1, image2, window, L):
 
 # mpcqi = np.mean(pcqi_map)
 
-ab_pcqi_map = pcqi(a, b, gaussiankernel, 256)
-mpcqi = np.mean(ab_pcqi_map)
-print(mpcqi)
 
-# cv.imwrite('ab.png', ab_pcqi_map)
-plt.imshow(ab_pcqi_map, cmap='gray')
-plt.colorbar()
-plt.show()
+# ab_pcqi_map = pcqi(a, b, gaussiankernel, 256)
+# mpcqi = np.mean(ab_pcqi_map)
+# print(mpcqi)
+#
+# # cv.imwrite('ab.png', ab_pcqi_map)
+# plt.imshow(ab_pcqi_map, cmap='gray')
+# plt.colorbar()
+# plt.show()
+ref = '/Users/admin/Documents/GitHub/IlluminationNormalization/Groundtruth A'
+
+# chars = 'ADC/'
+# chare = '_ADC'
+# ipath = '/Users/admin/Documents/GitHub/IlluminationNormalization/Ouput B/ADC'
+# opath = '/Users/admin/Documents/GitHub/IlluminationNormalization/ADCvsGT'
+#
+# path = ipath
+#
+# for each in glob.iglob(path + '/*.png'):
+#     imstring = each
+#     imname = imstring[imstring.find(chars) + 4: imstring.find(chare)]
+#
+#     he2 = cv.imread('Ouput B/HE2/' + imname + '_HE2.png', 0)
+#     adc = cv.imread('Ouput B/ADC/' + imname + '_ADC.png', 0)
+#     img = cv.imread(imstring, 0)
+#     n, m = img.shape
+#     dms = m, n
+#     grd = cv.imread(ref + '/' + imname + '_GT.jpeg', 0)
+#     grd = cv.resize(grd, dms, interpolation=cv.INTER_AREA)
+#
+#     pcqi_map = pcqi(img, grd, gaussiankernel, 256)
+#     mpcqi = np.mean(pcqi_map)
+#     print(imname + ': %d' % mpcqi)
+#
+#     # plt.imshow(pcqi_map, cmap='gray')
+#     # plt.suptitle(imname)
+#     # plt.colorbar()
+#     # plt.show()
+#
+#     fig, (ax) = plt.subplots(1, 1, constrained_layout=True)
+#     ax = plt.imshow(pcqi_map, cmap='gray')
+#     plt.colorbar()
+#     fig.suptitle(imname)
+#     fig.savefig(os.path.join(opath, imname + '_pcqi_ADCvsGT.png'))
+
+chars = 'A/'
+chare = '_Mertens07'
+# ipath = '/Users/admin/Documents/GitHub/IlluminationNormalization/Ouput B/HE1'
+opath = '/Users/admin/Documents/GitHub/IlluminationNormalization/PLCEvsGT'
+
+path = ref
+
+for each in glob.iglob(path + '/*.png'):
+    imstring = each
+    imname = imstring[imstring.find(chars) + 2: imstring.find(chare)]
+
+    adc = cv.imread('Ouput A/ADC/' + imname + '_ADC.png', 0)
+    he1 = cv.imread('Ouput A/HE1/' + imname + '_HE1.png', 0)
+    he2 = cv.imread('Ouput A/HE2/' + imname + '_HE2.png', 0)
+    plce = cv.imread('Ouput A/PLCE/' + imname + '_PLCE.png', 0)
+    # plce2 = cv.imread('Ouput B/PLCE2 and extensions/PLCE2/' + imname + '_PLCE2.png', 0)
+    # plce2bce = cv.imread('Ouput B/PLCE2 and extensions/PLCE2xBCE/' + imname + '_PLCE2xBCE.png', 0)
+    # retnet = cv.imread('Ouput B/RetinexNet/' + imname + '.jpeg', 0)
+
+    img = plce
+
+    n, m = img.shape
+    dms = m, n
+    grd = cv.imread(imstring, 0)
+    grd = cv.resize(grd, dms, interpolation=cv.INTER_AREA)
+
+    pcqi_map = pcqi(img, grd, gaussiankernel, 256)
+    mpcqi = np.mean(pcqi_map)
+    print(imname + ': %d' % mpcqi)
+
+    # plt.imshow(pcqi_map, cmap='gray')
+    # plt.suptitle(imname)
+    # plt.colorbar()
+    # plt.show()
+
+    fig, (ax) = plt.subplots(1, 1, constrained_layout=True)
+    ax = plt.imshow(pcqi_map, cmap='gray')
+    plt.colorbar()
+    fig.suptitle(imname)
+    fig.savefig(os.path.join(opath, imname + '_PLCEvsGT.png'))

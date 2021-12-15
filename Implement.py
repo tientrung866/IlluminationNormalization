@@ -104,7 +104,7 @@ def sumofCrossCorellation(image0):
 
     # powlog:
     Alpha = 1.1
-    list_beta = tracking_list_beta
+    list_beta =  list(np.arange(1, anchorbeta + 0.1, dx))
 
     Corr_values = []
     for beta in list_beta:
@@ -185,27 +185,6 @@ chare = chareB
 #     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
 #     cv.imwrite(os.path.join(opath_ADC, imname + '_ADC.png'), image1)
 
-# for each in glob.iglob(path + '/*.jpeg'):
-#     imstring = each
-#     imname = imstring[imstring.find(chars) + 2: imstring.find(chare)]
-#     print(imname)
-#
-#     image = cv.imread(each)
-#     image0 = cv.cvtColor(image, cv.COLOR_RGB2YCrCb)
-#     y_channel, cr_channel, cb_channel = cv.split(image0)
-#
-#     dy = sumofCrossCorellation(y_channel)
-#
-#     index_y = np.argmax(dy)
-#     last_beta = tracking_list_beta[index_y]
-#
-#     y_channel = powTheLogContrastEnhancement(y_channel, 3.75, last_beta)
-#     print(last_beta)
-#
-#     image1 = cv.merge([y_channel, cr_channel, cb_channel])
-#     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
-#     cv.imwrite(os.path.join(opath_PLCE, imname + '_PLCE.png'), image1)
-
 for each in glob.iglob(path + '/*.jpeg'):
     imstring = each
     imname = imstring[imstring.find(chars) + 2: imstring.find(chare)]
@@ -216,12 +195,6 @@ for each in glob.iglob(path + '/*.jpeg'):
     y_channel, cr_channel, cb_channel = cv.split(image0)
 
     dy = sumofCrossCorellation(y_channel)
-    ddy = diff(dy) / dx
-    dddy = diff(ddy) / dx
-    ddddy = diff(dddy) / dx
-    dddddy = diff(ddddy) / dx
-    ddddddy = diff(dddddy) / dx
-    dddddddy = diff(ddddddy) / dx
 
     index_y = np.argmax(dy)
     last_beta = tracking_list_beta[index_y]
@@ -232,3 +205,30 @@ for each in glob.iglob(path + '/*.jpeg'):
     image1 = cv.merge([y_channel, cr_channel, cb_channel])
     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
     cv.imwrite(os.path.join(opath_PLCE, imname + '_PLCE.png'), image1)
+
+# for each in glob.iglob(path + '/*.jpeg'):
+#     imstring = each
+#     imname = imstring[imstring.find(chars) + 2: imstring.find(chare)]
+#     print(imname)
+#
+#     image = cv.imread(each)
+#     image0 = cv.cvtColor(image, cv.COLOR_RGB2YCrCb)
+#     y_channel, cr_channel, cb_channel = cv.split(image0)
+#
+#     dy = sumofCrossCorellation(y_channel)
+#     ddy = diff(dy) / dx
+#     dddy = diff(ddy) / dx
+#     ddddy = diff(dddy) / dx
+#     dddddy = diff(ddddy) / dx
+#     ddddddy = diff(dddddy) / dx
+#     dddddddy = diff(ddddddy) / dx
+#
+#     index_y = np.argmax(dy)
+#     last_beta = tracking_list_beta[index_y]
+#
+#     y_channel = powTheLogContrastEnhancement(y_channel, 3.75, last_beta)
+#     print(last_beta)
+#
+#     image1 = cv.merge([y_channel, cr_channel, cb_channel])
+#     image1 = cv.cvtColor(image1, cv.COLOR_YCrCb2RGB)
+#     cv.imwrite(os.path.join(opath_PLCE, imname + '_PLCE.png'), image1)
